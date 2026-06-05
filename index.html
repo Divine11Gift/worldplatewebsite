@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="=en">
+<html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale+1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>WorldPlate - International Recipes</title>
-        <linkn href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;400&family=DM+San:wght@300;400;500&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
         <style>
             :root {
                 --cream:#FAF7F2;
@@ -61,10 +61,10 @@
             .search-bar { display: flex; align-items: center;
             background: #E8E2D9; border: 1px solid var(--border);
          border-radius: 999px; padding: 6px 14px; gap: 8px;
-         transition: border-color o.2s; 
+         transition: border-color 0.2s; 
         }
         .search-bar:focus-within {border-color: var(--accent); }
-        .search-bar input { border: none; background: transperent; font-family: 'DM Sans', sans-serif; font-size: 14px; width: 200px; color: var(--ink); }
+        .search-bar input { border: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 14px; width: 200px; color: var(--ink); outline: none; }
         .search-bar svg {color: var(--muted); flex-shrink: 0; }
 
         .cart-btn {
@@ -491,20 +491,19 @@
     nav { padding: 0 1rem; }
     .search-bar input { width: 130px; }
   }
-            </style>
-    </linkn>
+        </style>
     </head>
-
+    <body>
     <!-- NAV -->
      <nav>
-        <div class="logo">World<span>Plate</span></div>>
+        <div class="logo">World<span>Plate</span></div>
         <div class="nav-right">
             <div class="search-bar">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="searchInput" placeholder="Search dishes…" oninput="filterRecipes()">
     </div>
     <button class="cart-btn" onclick="openCart()">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
       Cart
       <div class="cart-badge" id="cartBadge">0</div>
     </button>
@@ -998,17 +997,17 @@ function renderGrid() {
         <div class="recipe-name">${r.name}</div>
         <div class="recipe-desc">${r.desc}</div>
         <div class="recipe-meta">
-          <span>⏱ ${r.time}</span>
-          <span>👥 Serves ${r.servings}</span>
-          <span>📋 ${r.ingredients.length} ingredients</span>
+          <span>⏱️ ${r.time}</span>
+          <span>👥 ${r.servings}</span>
         </div>
         <div class="recipe-actions">
-          <button class="btn-view" onclick="openModal(${r.id})">View Recipe</button>
-          <button class="btn-add ${inCart ? 'added' : ''}" onclick="addToCart(${r.id}, event)">
-            ${inCart ? '✓ Added' : '+ Cart'}
+          <button class="btn-view" onclick="viewRecipe(${r.id})">View Recipe</button>
+          <button class="btn-add ${inCart ? 'added' : ''}" onclick="addToCart(${r.id}, this)">
+            ${inCart ? '✓ Added' : '+ Add'}
           </button>
         </div>
-      </div>`;
+      </div>
+    `;
     grid.appendChild(card);
   });
 }
@@ -1025,143 +1024,136 @@ function filterRecipes() {
   renderGrid();
 }
  
-function openModal(id) {
-  const r = recipes.find(x => x.id === id);
-  if (!r) return;
-  activeRecipe = r;
-  document.getElementById('modalImg').style.background = r.bg;
-  document.getElementById('modalImg').innerHTML = `<span style="font-size:7rem">${r.emoji}</span><button class="modal-close" onclick="closeModalDirect()">✕</button>`;
-  document.getElementById('modalCuisine').textContent = r.cuisine + ' · ' + r.country;
-  document.getElementById('modalName').textContent = r.name;
-  document.getElementById('modalDesc').textContent = r.desc;
-  document.getElementById('modalMeta').innerHTML = `
-    <div class="meta-chip">⏱ ${r.time}</div>
-    <div class="meta-chip">👥 Serves ${r.servings}</div>
-    <div class="meta-chip">📋 ${r.ingredients.length} ingredients</div>
-    <div class="meta-chip diff-${r.difficulty.toLowerCase()}">${r.difficulty}</div>`;
-  document.getElementById('modalIngredients').innerHTML = r.ingredients.map(i =>
-    `<div class="ingredient-item"><strong>${i.name}</strong><span>${i.amount}</span></div>`).join('');
-  document.getElementById('modalSteps').innerHTML = r.steps.map((s, i) =>
-    `<div class="step-item"><div class="step-num">${i+1}</div><div class="step-text">${s}</div></div>`).join('');
-  const addBtn = document.getElementById('modalAddBtn');
-  if (cart[r.id]) { addBtn.textContent = '✓ In Cart'; addBtn.classList.add('added'); }
-  else { addBtn.textContent = '+ Add to Cart'; addBtn.classList.remove('added'); }
+function viewRecipe(id) {
+  activeRecipe = recipes.find(r => r.id === id);
+  if (!activeRecipe) return;
+  
+  document.getElementById('modalImg').innerHTML = `<button class="modal-close" onclick="closeModalDirect()">✕</button><span style="font-size:6rem">${activeRecipe.emoji}</span>`;
+  document.getElementById('modalCuisine').textContent = activeRecipe.cuisine;
+  document.getElementById('modalName').textContent = activeRecipe.name;
+  document.getElementById('modalDesc').textContent = activeRecipe.desc;
+  
+  let metaHTML = `<div class="meta-chip">⏱️ ${activeRecipe.time}</div><div class="meta-chip">👥 ${activeRecipe.servings}</div><div class="meta-chip">📍 ${activeRecipe.country}</div><div class="meta-chip">${activeRecipe.difficulty}</div>`;
+  document.getElementById('modalMeta').innerHTML = metaHTML;
+  
+  let ingredHTML = '';
+  activeRecipe.ingredients.forEach(ing => {
+    ingredHTML += `<div class="ingredient-item"><strong>${ing.name}</strong><span>${ing.amount}</span></div>`;
+  });
+  document.getElementById('modalIngredients').innerHTML = ingredHTML;
+  
+  let stepsHTML = '';
+  activeRecipe.steps.forEach((step, i) => {
+    stepsHTML += `<div class="step-item"><div class="step-num">${i + 1}</div><div class="step-text">${step}</div></div>`;
+  });
+  document.getElementById('modalSteps').innerHTML = stepsHTML;
+  
   document.getElementById('modalBackdrop').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  const btn = document.getElementById('modalAddBtn');
+  btn.textContent = cart[id] ? '✓ Added to Cart' : '+ Add to Cart';
+  btn.classList.toggle('added', !!cart[id]);
 }
  
-function closeModal(e) {
-  if (e.target === document.getElementById('modalBackdrop')) closeModalDirect();
+function closeModal(event) {
+  if (event.target.id === 'modalBackdrop') {
+    document.getElementById('modalBackdrop').classList.remove('open');
+  }
 }
  
 function closeModalDirect() {
   document.getElementById('modalBackdrop').classList.remove('open');
-  document.body.style.overflow = '';
+}
+ 
+function addToCart(id, btn) {
+  if (!cart[id]) {
+    cart[id] = 1;
+    btn.textContent = '✓ Added';
+    btn.classList.add('added');
+    showToast('Added to cart!');
+  } else {
+    delete cart[id];
+    btn.textContent = '+ Add';
+    btn.classList.remove('added');
+    showToast('Removed from cart');
+  }
+  updateCartUI();
+  renderGrid();
 }
  
 function addFromModal() {
-  if (!activeRecipe) return;
-  addToCart(activeRecipe.id);
-  const btn = document.getElementById('modalAddBtn');
-  btn.textContent = '✓ In Cart'; btn.classList.add('added');
+  if (activeRecipe) {
+    addToCart(activeRecipe.id, document.getElementById('modalAddBtn'));
+  }
 }
  
-function addToCart(id, e) {
-  if (e) e.stopPropagation();
-  const r = recipes.find(x => x.id === id);
-  if (cart[id]) { cart[id].qty++; }
-  else { cart[id] = { ...r, qty: 1 }; }
+function openCart() {
+  document.getElementById('cartOverlay').classList.add('open');
+  document.getElementById('cartSidebar').classList.add('open');
   updateCartUI();
-  renderGrid();
-  showToast(`${r.emoji} ${r.name} added to cart`);
+}
+ 
+function closeCart() {
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.getElementById('cartSidebar').classList.remove('open');
+}
+ 
+function updateCartUI() {
+  const cartItems = document.getElementById('cartItems');
+  const cartBadge = document.getElementById('cartBadge');
+  const count = Object.keys(cart).length;
+  
+  cartBadge.textContent = count;
+  cartBadge.style.display = count > 0 ? 'flex' : 'none';
+  
+  if (count === 0) {
+    document.getElementById('cartEmpty').style.display = 'flex';
+    document.getElementById('cartFooter').style.display = 'none';
+  } else {
+    document.getElementById('cartEmpty').style.display = 'none';
+    document.getElementById('cartFooter').style.display = 'block';
+    
+    cartItems.innerHTML = '';
+    Object.keys(cart).forEach(id => {
+      const recipe = recipes.find(r => r.id == id);
+      const item = document.createElement('div');
+      item.className = 'cart-item';
+      item.innerHTML = `
+        <div class="cart-item-emoji">${recipe.emoji}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${recipe.name}</div>
+          <div class="cart-item-cuisine">${recipe.cuisine}</div>
+        </div>
+        <button class="cart-remove" onclick="removeFromCart(${id})">✕</button>
+      `;
+      cartItems.appendChild(item);
+    });
+    
+    document.getElementById('cartItemCount').textContent = count + (count === 1 ? ' item' : ' items');
+    document.getElementById('cartTotal').textContent = count;
+  }
 }
  
 function removeFromCart(id) {
   delete cart[id];
   updateCartUI();
   renderGrid();
-}
- 
-function changeQty(id, delta) {
-  if (!cart[id]) return;
-  cart[id].qty += delta;
-  if (cart[id].qty <= 0) { delete cart[id]; }
-  updateCartUI();
-  renderGrid();
-}
- 
-function updateCartUI() {
-  const items = Object.values(cart);
-  const totalQty = items.reduce((s, i) => s + i.qty, 0);
-  const badge = document.getElementById('cartBadge');
-  badge.textContent = totalQty;
-  badge.style.display = totalQty > 0 ? 'flex' : 'none';
- 
-  const container = document.getElementById('cartItems');
-  const footer = document.getElementById('cartFooter');
-  const empty = document.getElementById('cartEmpty');
- 
-  if (items.length === 0) {
-    container.innerHTML = '';
-    container.appendChild(empty);
-    empty.style.display = 'flex';
-    footer.style.display = 'none';
-    return;
-  }
- 
-  empty.style.display = 'none';
-  footer.style.display = 'block';
-  container.innerHTML = items.map(item => `
-    <div class="cart-item">
-      <div class="cart-item-emoji">${item.emoji}</div>
-      <div class="cart-item-info">
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-cuisine">${item.cuisine} · ${item.country}</div>
-      </div>
-      <div class="cart-item-qty">
-        <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
-        <span class="qty-num">${item.qty}</span>
-        <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
-      </div>
-      <button class="cart-remove" onclick="removeFromCart(${item.id})" title="Remove">✕</button>
-    </div>`).join('');
-  container.appendChild(document.createElement('div'));
- 
-  document.getElementById('cartItemCount').textContent = `${items.length} recipe${items.length > 1 ? 's' : ''}`;
-  document.getElementById('cartTotal').textContent = totalQty + (totalQty === 1 ? ' serving' : ' servings');
-}
- 
-function openCart() {
-  document.getElementById('cartSidebar').classList.add('open');
-  document.getElementById('cartOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
- 
-function closeCart() {
-  document.getElementById('cartSidebar').classList.remove('open');
-  document.getElementById('cartOverlay').classList.remove('open');
-  document.body.style.overflow = '';
+  showToast('Removed from cart');
 }
  
 function checkout() {
-  const items = Object.values(cart);
-  if (!items.length) return;
-  let text = "🌍 My WorldPlate Recipe List:\n\n";
-  items.forEach(i => { text += `${i.emoji} ${i.name} (${i.cuisine}) × ${i.qty}\n`; });
-  try { navigator.clipboard.writeText(text); } catch(e) {}
-  showToast('📋 Recipe list copied to clipboard!');
+  const items = Object.keys(cart).map(id => recipes.find(r => r.id == id).name).join(', ');
+  alert('Your recipe list:\n\n' + items + '\n\nSaved!');
+  showToast('List shared! ✨');
 }
  
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
 }
  
-// Init
-updateCartUI();
 renderGrid();
 </script>
-     </nav>
+    </body>
 </html>
